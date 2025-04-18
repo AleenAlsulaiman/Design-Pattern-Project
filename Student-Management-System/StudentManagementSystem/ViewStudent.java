@@ -1,79 +1,95 @@
 package StudentManagement;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JDesktopPane;
-import javax.swing.JLabel;
-import java.awt.Font;
-import java.awt.Color;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class ViewStudent extends JFrame {
 
-	private JPanel contentPane;
+    // 1. Define the Abstract Factory Interface
+    public interface StudentViewFactory {
+        JPanel createContentPane();
+        JDesktopPane createDesktopPane();
+        JLabel createTitleLabel();
+        JButton createBackButton();
+    }
 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ViewStudent frame = new ViewStudent();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+    // 2. Default Factory Implementation (matches original behavior)
+    private static class DefaultStudentViewFactory implements StudentViewFactory {
+        @Override
+        public JPanel createContentPane() {
+            JPanel panel = new JPanel();
+            panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            return panel;
+        }
 
-	public ViewStudent() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 782, 611);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		
-		JDesktopPane desktopPane = new JDesktopPane();
-		desktopPane.setBackground(Color.GRAY);
-		GroupLayout gl_contentPane = new GroupLayout(contentPane);
-		gl_contentPane.setHorizontalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(desktopPane, GroupLayout.PREFERRED_SIZE, 753, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		);
-		gl_contentPane.setVerticalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(desktopPane, GroupLayout.PREFERRED_SIZE, 139, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(423, Short.MAX_VALUE))
-		);
-		
-		JLabel lblNewLabel = new JLabel("Student Details");
-		lblNewLabel.setForeground(Color.BLACK);
-		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 28));
-		lblNewLabel.setBounds(255, 27, 225, 52);
-		desktopPane.add(lblNewLabel);
-		
-		JButton btnNewButton = new JButton("Go Back");
-		btnNewButton.setForeground(Color.BLACK);
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Menu menu = new Menu();
-				menu.show();
-				dispose();
-			}
-		});
-		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 14));
-		btnNewButton.setBounds(10, 96, 113, 32);
-		desktopPane.add(btnNewButton);
-		contentPane.setLayout(gl_contentPane);
-	}
+        @Override
+        public JDesktopPane createDesktopPane() {
+            JDesktopPane pane = new JDesktopPane();
+            pane.setBackground(Color.GRAY);
+            return pane;
+        }
+
+        @Override
+        public JLabel createTitleLabel() {
+            JLabel label = new JLabel("Student Details");
+            label.setForeground(Color.BLACK);
+            label.setFont(new Font("Tahoma", Font.BOLD, 28));
+            return label;
+        }
+
+        @Override
+        public JButton createBackButton() {
+            JButton button = new JButton("Go Back");
+            button.setForeground(Color.BLACK);
+            button.setFont(new Font("Tahoma", Font.BOLD, 14));
+            button.addActionListener(e -> {
+                new Menu().setVisible(true);
+                dispose();
+            });
+            return button;
+        }
+    }
+
+    // 3. Refactored ViewStudent Class
+    private final StudentViewFactory factory;
+
+    public ViewStudent() {
+        this(new DefaultStudentViewFactory()); // Use default factory
+    }
+
+    public ViewStudent(StudentViewFactory factory) {
+        this.factory = factory;
+        initializeUI();
+    }
+
+    private void initializeUI() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 782, 611);
+
+        // Create components using factory
+        JPanel contentPane = factory.createContentPane();
+        JDesktopPane desktopPane = factory.createDesktopPane();
+        JLabel titleLabel = factory.createTitleLabel();
+        JButton backButton = factory.createBackButton();
+
+        // Position components (matches original layout)
+        titleLabel.setBounds(255, 27, 225, 52);
+        desktopPane.add(titleLabel);
+        backButton.setBounds(10, 96, 113, 32);
+        desktopPane.add(backButton);
+
+        // Set layout (matches original GroupLayout behavior)
+        contentPane.setLayout(new BorderLayout());
+        contentPane.add(desktopPane, BorderLayout.NORTH);
+        setContentPane(contentPane);
+    }
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            new ViewStudent().setVisible(true); // Still works the same way
+        });
+    }
 }
