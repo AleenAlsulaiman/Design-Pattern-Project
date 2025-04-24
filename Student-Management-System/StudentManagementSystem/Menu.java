@@ -23,6 +23,62 @@ public class Menu extends JFrame {
 
 	private JPanel contentPane;
 
+// === جديد: كائنات تمثل العمليات (جسر Bridge)
+abstract class MenuAction {
+    protected ActionImplementor implementor;
+
+    public MenuAction(ActionImplementor implementor) {
+        this.implementor = implementor;
+    }
+
+    public abstract void perform();
+}
+
+interface ActionImplementor {
+    void execute();
+}
+
+class AddStudentImpl implements ActionImplementor {
+    public void execute() {
+        new Student().show();
+    }
+}
+
+class RemoveStudentImpl implements ActionImplementor {
+    public void execute() {
+        new RemoveStudent().show();
+    }
+}
+
+class ViewStudentImpl implements ActionImplementor {
+    public void execute() {
+        new ViewStudent().show();
+    }
+}
+
+class UpdateStudentImpl implements ActionImplementor {
+    public void execute() {
+        new UpdateStudent().show();
+    }
+}
+
+class LogoutImpl implements ActionImplementor {
+    public void execute() {
+        new Login().show();
+        JOptionPane.showMessageDialog(null, "Successfully logged out :)");
+    }
+}
+
+class StandardAction extends MenuAction {
+    public StandardAction(ActionImplementor implementor) {
+        super(implementor);
+    }
+
+    public void perform() {
+        implementor.execute();
+    }
+}
+
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
