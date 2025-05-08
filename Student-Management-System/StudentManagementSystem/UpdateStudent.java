@@ -131,17 +131,46 @@ public class UpdateStudent extends JFrame {
 				catch(Exception ex) {
 					JOptionPane.showMessageDialog(null, ex);
 				}
-				
-				
-				
-				
-				
-				
+			
 				
 			}
 		});
 		updateBtn.setForeground(Color.BLACK);
 		updateBtn.setFont(new Font("Tahoma", Font.BOLD, 14));
+
+// 
+		ActionListener searchCommand = e -> {
+			String str = updateEntry.getText();
+			try {
+				con = DriverManager.getConnection("jdbc:mysql://localhost/studentmanagementsystem", "root", "");
+				pst = con.prepareStatement("SELECT * FROM student where entrynumber = ?");
+				pst.setString(1, str);
+				rs = pst.executeQuery();
+				if(rs.next()==true) {
+					String s = rs.getString(1);
+					String s1 = rs.getString(2);
+					String s2 = rs.getString(3);
+					String s3 = rs.getString(4);
+					String s4 = rs.getString(5);
+					
+					nameU.setText(s);
+					entryU.setText(s1);
+					emailU.setText(s2);
+					contactU.setText(s3);
+					homeU.setText(s4);
+				}
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		};
+
+		//
+		ActionListener cancelCommand = e -> {
+			Menu menu = new Menu();
+			menu.show();
+			dispose();
+		};
+		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -210,54 +239,20 @@ public class UpdateStudent extends JFrame {
 		desktopPane.add(updateEntry);
 		updateEntry.setColumns(10);
 		
+
 		JButton btnNewButton = new JButton("Search");
 		btnNewButton.setForeground(Color.BLACK);
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-				String str = updateEntry.getText();
-				
-				try {
-					con = DriverManager.getConnection("jdbc:mysql://localhost/studentmanagementsystem", "root", "");
-					pst = con.prepareStatement("SELECT * FROM student where entrynumber = ?");
-					pst.setString(1, str);
-					rs = pst.executeQuery();
-					if(rs.next()==true) {
-						 String s = rs.getString(1);
-						 String s1 = rs.getString(2);
-						 String s2 = rs.getString(3);
-						 String s3 = rs.getString(4);
-						 String s4 = rs.getString(5);
-						
-						 nameU.setText(s);
-						 entryU.setText(s1);
-						 emailU.setText(s2);
-						 contactU.setText(s3);
-						 homeU.setText(s4);
-					}
-					
-				}
-				catch (SQLException e1) {
-					e1.printStackTrace();
-				}
-				
-			}
-		});
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnNewButton.setBounds(334, 164, 149, 33);
+		btnNewButton.addActionListener(searchCommand); //
 		desktopPane.add(btnNewButton);
 		
+		//
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.setForeground(Color.BLACK);
-		btnCancel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Menu menu = new Menu();
-				menu.show();
-				dispose();
-			}
-		});
 		btnCancel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnCancel.setBounds(143, 164, 149, 33);
+		btnCancel.addActionListener(cancelCommand); // 
 		desktopPane.add(btnCancel);
 		
 		JLabel lblNewLabel = new JLabel("Search the \"Entry Number\"");
